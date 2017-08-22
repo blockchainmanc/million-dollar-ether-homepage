@@ -1,0 +1,11 @@
+{
+  "name": "million-dollar-homepage-ether",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "James Morgan <james.morgan.e@googlemail.com> (htp://github.com/jamesmorgan)",
+  "license": "ISC"
+}
