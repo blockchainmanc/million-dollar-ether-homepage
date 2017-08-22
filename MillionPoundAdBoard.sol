@@ -8,6 +8,14 @@ pragma solidity ^0.4.0;
  * The ability to purchase a location of on a piece of web ad space.
  * Payment to be made in ETHER, cost & size defined by contract creator
  *
+ * Rules
+ * =====
+ * Purchase price is 1 pixel = 100000000000000 wei (1000000 [1 million pixel] x 0.001 eth [100000000000000 wei] = 100 ETHER for the full board
+ * Original board creator sells first pixel space
+ * After purchase owner can re-sell at price of purchase + 0.001 ether per pixel
+ * User is allow to upload image against purchase space
+ * Smallest space allowed to be purchased is 100 * 100 pixels = 0.1 ether
+ *
  * Phase 1
  * =======
  *
@@ -17,7 +25,7 @@ pragma solidity ^0.4.0;
  * 2) Allow the creator of the board to define a payment address
  * 3) Allow 3rd parties to purchase X number of sections/pixels on the board
  *  - 3rd party can supply a img URL which is placed on the page in the location purchased
- * 4) Construct wed app to display the outcome of purchases
+ * 4) Construct web app to display the outcome of purchases
  *
  * Phase 2
  * =======
@@ -59,7 +67,9 @@ contract AdvertBoard {
         costPerUnitInWei = _costPerUnitInWei;
     }
 
-    function makePurchase() {
+	// Accessors
+
+    function purchaseAdSpace(int fromX, int fromY, int size) {
         // TODO return success/failure
         // TODO how to received funds in payment?
     }
@@ -71,5 +81,12 @@ contract AdvertBoard {
     function transferOwnership(address _purchaser, int _purchasePrice){
         address owner = msg.sender; // whos buying it (the initiator of the transaction)
     }
+
+	// Validators
+
+	modifier isAdmin {
+		if (msg.sender != boardCreator) throw;
+		_;
+	}
 
 }
