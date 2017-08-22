@@ -1,4 +1,6 @@
 pragma solidity ^0.4.0;
+
+
 /**
  *
  * Concept:
@@ -15,6 +17,7 @@ pragma solidity ^0.4.0;
  * After purchase owner can re-sell at price of purchase + 0.001 ether per pixel
  * User is allow to upload image against purchase space
  * Smallest space allowed to be purchased is 100 * 100 pixels = 0.1 ether
+ * Largest space allowed to be purchased is 1000 * 1000 pixels = 1 ether
  *
  * Phase 1
  * =======
@@ -43,50 +46,76 @@ pragma solidity ^0.4.0;
  **/
 contract AdvertBoard {
 
-    struct Owner {
-        address delegate;
-        SpaceLocation location;
-    }
+	struct Owner {
+	address delegate;
+	SpaceLocation location;
+	}
 
-    struct SpaceLocation {
-        uint8 x;
-        uint8 y;
-    }
+	struct SpaceLocation {
+	uint8 x;
+	uint8 y;
+	}
 
-    // TODO how to map 2d array of locations - 1m + 1m
+	// TODO how to map 2d array of locations - 1m + 1m
 
 	address private boardCreator; // who creates the initial board (may not be required) / administrator
 
-    int boardSize; // the initial size of the board
-    int costPerUnitInWei; // the cost per pixel in wei
-    mapping(bytes32 => Owner) owners; // map of address to owners for lookup (needs testing)
+	int boardSize; // the initial size of the board
+	int costPerUnitInWei; // the cost per pixel in wei
+	mapping (bytes32 => Owner) owners; // map of address to owners for lookup (needs testing)
 
-    function AdvertBoard(int _boardSize, int _costPerUnitInWei) {
-        boardCreator = msg.sender;
-        boardSize = _boardSize;
-        costPerUnitInWei = _costPerUnitInWei;
-    }
+	function AdvertBoard(int _boardSize, int _costPerUnitInWei) {
+		boardCreator = msg.sender;
+		boardSize = _boardSize;
+		costPerUnitInWei = _costPerUnitInWei;
+	}
 
 	// Accessors
 
-    function purchaseAdSpace(int fromX, int fromY, int size) {
-        // TODO return success/failure
-        // TODO how to received funds in payment?
-    }
+	function purchaseAdSpace(int fromX, int fromY, int size, string imgUrl) {
+		// TODO return success/failure
+		// TODO how to received funds in payment?
+		isValidPurchaseSpace();
+	}
 
-    function getBoard() {
-        // TODO simply return the current state of the baord
-    }
+	function getBoard() {
+		// TODO simply return the current state of the baord
+	}
 
-    function transferOwnership(address _purchaser, int _purchasePrice){
-        address owner = msg.sender; // whos buying it (the initiator of the transaction)
-    }
+	function transferOwnership(address _purchaser, int _purchasePrice, string imgUrl){
+		address owner = msg.sender;
+		// whos buying it (the initiator of the transaction)
+	}
+
+
+	function updateImgUrl(string imgUrl){
+		address owner = msg.sender;
+		// TODO is this chargeable
+	}
+
+	function getAdvertSpacePrice() {
+		// TODO calculate and return price with some meta data
+	}
 
 	// Validators
 
-	modifier isAdmin {
+	modifier isBoardAdmin {
 		if (msg.sender != boardCreator) throw;
 		_;
+	}
+
+	modifier isValidPurchaseSpace {
+		isValidMinSize();
+		isValidMaxSize();
+		// TODO space not already take
+	}
+
+	modifier isValidMinSize() {
+		// TODO space not < 100 * 100 pixels
+	}
+
+	modifier isValidMaxSize() {
+		// TODO space not > 1000 * 1000 pixels
 	}
 
 }
