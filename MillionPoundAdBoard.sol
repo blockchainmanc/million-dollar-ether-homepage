@@ -10,7 +10,7 @@ pragma solidity ^0.4.0;
  * The ability to purchase a location of on a piece of web ad space.
  * Payment to be made in ETHER, cost & size defined by contract creator
  *
- * Rules
+ * Rules - https://etherconverter.online/
  * =====
  * Purchase price is 1 pixel = 100000000000000 wei (1000000 [1 million pixel] x 0.001 eth [100000000000000 wei] = 100 ETHER for the full board
  * Original board creator sells first pixel space
@@ -47,27 +47,62 @@ pragma solidity ^0.4.0;
 contract AdvertBoard {
 
 	struct Owner {
-	address delegate;
-	SpaceLocation location;
+		uint32 purchaseAtTime;
+		uint ownerID;
+	}
+	mapping(address => Owner) private owners;
+	mapping(uint => address) private ownersAddrs;
+
+	struct Area {
+		address owner;		// the owner of this area
+		uint imageID;		// the image backing this purchase
+		uint purchaseSize;	// the total size purchased (should this live on Image?)
+		uint salePrice;		// the total sale price for this area
+		// TODO record max resale price at this point?
 	}
 
-	struct SpaceLocation {
-	uint8 x;
-	uint8 y;
+	// purchased areas (check size requirements)
+	Area[1000][1000] private areasPurchased;
+
+	// The advert
+	struct Image {
+		// coordinates
+		uint8 fromX;
+		uint8 toX;
+		uint8 fromY;
+		uint8 toY;
+
+		// images details
+		string imageUrl;
+		string imageLink;
+		string altText;
 	}
 
-	// TODO how to map 2d array of locations - 1m + 1m
+	// image DB
+	mapping (uint => Image) private images;
 
-	address private boardCreator; // who creates the initial board (may not be required) / administrator
+	// Board Config
+	address private boardCreator;		// board creator / administrator
+	bool private contractKilled = false;// emergency kill switch, disables all future sales
 
-	int boardSize; // the initial size of the board
-	int costPerUnitInWei; // the cost per pixel in wei
-	mapping (bytes32 => Owner) owners; // map of address to owners for lookup (needs testing)
+	uint public boardSize = 0;       	// the initial size of the board
+	uint public costPerUnitInWei = 0;   // the cost per pixel in wei
 
+	// Constructor - board creation logic
 	function AdvertBoard(int _boardSize, int _costPerUnitInWei) {
+		// keep a track of the board creator
 		boardCreator = msg.sender;
+
+		// configure the board
 		boardSize = _boardSize;
 		costPerUnitInWei = _costPerUnitInWei;
+
+		// create an initial owner for the board creator
+		owners[boardCreator].purchaseAtTime = uint32(now);
+		owners[boardCreator].ownerID = 0;
+
+		// persist mapping from owner to address
+		ownersAddrs[owners[boardCreator].ownerID] = boardCreator;
 	}
 
 	// Accessors
@@ -97,6 +132,14 @@ contract AdvertBoard {
 		// TODO calculate and return price with some meta data
 	}
 
+	function calculateTotalSpaceRequired(int fromX, int fromY, int size) {
+
+	}
+
+	function isSpaceAlreadyTaken() {
+
+	}
+
 	// Validators
 
 	modifier isBoardAdmin {
@@ -118,4 +161,12 @@ contract AdvertBoard {
 		// TODO space not > 1000 * 1000 pixels
 	}
 
+
+	// If something goes wrongs stop immediately!
+	modifier killSwitch {
+		if (msg.sender != admin) {
+			if (contractKilled) throw;
+		}
+		_;
+	}
 }
