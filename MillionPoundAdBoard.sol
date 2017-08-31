@@ -46,6 +46,7 @@ pragma solidity ^0.4.0;
  **/
 contract AdvertBoard {
 
+	// RAn owner of a piece of space
 	struct Owner {
 		uint32 purchaseAtTime;
 		uint ownerID;
@@ -53,6 +54,7 @@ contract AdvertBoard {
 	mapping(address => Owner) private owners;
 	mapping(uint => address) private ownersAddrs;
 
+	// An area of the advert board
 	struct Area {
 		address owner;		// the owner of this area
 		uint imageID;		// the image backing this purchase
@@ -107,10 +109,16 @@ contract AdvertBoard {
 
 	// Accessors
 
-	function purchaseAdSpace(int fromX, int fromY, int size, string imgUrl) {
+	function purchaseAdSpace (uint8 fromX, uint8 toX, uint8 fromY, uint8 toY, string imgUrl)
+	public
+	payable
+		killSwitch() // quick exit check
+		isAdvertSpaceAvailable(fromX, toX, fromY, toX) // validate purchase
+	{
 		// TODO return success/failure
 		// TODO how to received funds in payment?
-		isValidPurchaseSpace();
+
+		uint totalPurchasePrice = calculatePurchasePrice(fromX, toX, fromY, toX, msg.sender);
 	}
 
 	function getBoard() {
@@ -128,16 +136,31 @@ contract AdvertBoard {
 		// TODO is this chargeable
 	}
 
-	function getAdvertSpacePrice() {
-		// TODO calculate and return price with some meta data
+	function calculatePurchasePrice(uint8 fromX, uint8 toX, uint8 fromY, uint8 toY, address purchaser)
+	private
+	returns (uint)
+	{
+		// if the board creator is making a purchase it should be free as they own the board
+		if (owners[purchaser].ownerID == 0){
+			return 0;
+		}
+
+		uint totalAreaPrice;
+
+		// iterate the pixel space
+		for (uint8 ix = fromX; ix <= toX; ix++) {
+			for (uint8 iy = fromY; iy <= toY; iy++) {
+				// add a cost that each pixel
+				totalAreaPrice += costPerUnitInWei;
+			}
+		}
+
+		return totalAreaPrice;
 	}
 
-	function calculateTotalSpaceRequired(int fromX, int fromY, int size) {
-
-	}
-
-	function isSpaceAlreadyTaken() {
-
+	function isSpaceAlreadyTaken(uint8 fromX, uint8 toX, uint8 fromY, uint8 toY) {
+		// TODO check if all pixels are either unowned or owned by the current called
+		// current msg.caller can over write pixel space for free
 	}
 
 	// Validators
@@ -147,20 +170,30 @@ contract AdvertBoard {
 		_;
 	}
 
-	modifier isValidPurchaseSpace {
-		isValidMinSize();
-		isValidMaxSize();
-		// TODO space not already take
+	// Run all validation functions
+	modifier isValidPurchaseSpace(uint8 fromX, uint8 toX, uint8 fromY, uint8 toY) {
+		isValidMinSize(fromX, toX, fromY, toX);
+		isValidMaxSize(fromX, toX, fromY, toX);
+		isSpaceAlreadyTaken(fromX, toX, fromY, toX);
 	}
 
-	modifier isValidMinSize() {
-		// TODO space not < 100 * 100 pixels
+	// Validate min space is no smaller than 100 x 100 pixels long
+	modifier isValidMinSize(uint8 fromX, uint8 toX, uint8 fromY, uint8 toY) {
+		uint8 xAxis = fromX * toX;
+		uint8 yAxis = fromY * toY;
+
+		if ((xAxis > 100) || (yAxis > 100)) throw;
+		_;
 	}
 
-	modifier isValidMaxSize() {
-		// TODO space not > 1000 * 1000 pixels
-	}
+	// Validate max space is no larger than 1000 x 1000 pixels long
+	modifier isValidMaxSize(uint8 fromX, uint8 toX, uint8 fromY, uint8 toY) {
+		uint8 xAxis = fromX * toX;
+		uint8 yAxis = fromY * toY;
 
+		if ((xAxis < 1000) || (yAxis < 1000)) throw;
+		_;
+	}
 
 	// If something goes wrongs stop immediately!
 	modifier killSwitch {
