@@ -79,19 +79,19 @@ contract AdvertBoard {
 		string imageLink;
 		string altText;
 	}
-
+  
 	// image DB
 	mapping (uint => Image) private images;
 
 	// Board Config
 	address private boardCreator;		// board creator / administrator
-	bool private contractKilled = false;// emergency kill switch, disables all future sales
+	bool private stopped = false;// emergency kill switch, disables all future sales
 
 	uint public boardSize = 0;       	// the initial size of the board
 	uint public costPerUnitInWei = 0;   // the cost per pixel in wei
 
 	// Constructor - board creation logic
-	function AdvertBoard(int _boardSize, int _costPerUnitInWei) {
+	function AdvertBoard(uint _boardSize, uint _costPerUnitInWei) {
 		// keep a track of the board creator
 		boardCreator = msg.sender;
 
@@ -112,8 +112,8 @@ contract AdvertBoard {
 	function purchaseAdSpace (uint8 fromX, uint8 toX, uint8 fromY, uint8 toY, string imgUrl)
 	public
 	payable
-		killSwitch() // quick exit check
-		isAdvertSpaceAvailable(fromX, toX, fromY, toX) // validate purchase
+		// TODO add fail safe kill switch - only admin can trigger and forces refund etc
+		isValidPurchaseSpace(fromX, toX, fromY, toX) // validate purchase
 	{
 		// TODO return success/failure
 		// TODO how to received funds in payment?
@@ -163,18 +163,35 @@ contract AdvertBoard {
 		// current msg.caller can over write pixel space for free
 	}
 
+	function toggleContractActive() isBoardAdmin public {
+		// You can add an additional modifier that restricts stopping a contract to be based on another action, such as a vote of users
+		stopped = !stopped;
+	}
+
+	modifier stopInEmergency { 
+		if (!stopped) 
+		_; 
+	}
+	modifier onlyInEmergency {
+		 if (stopped) 
+		 _; 
+	}
+
 	// Validators
 
 	modifier isBoardAdmin {
-		if (msg.sender != boardCreator) throw;
+		assert(msg.sender == boardCreator);
 		_;
 	}
 
 	// Run all validation functions
-	modifier isValidPurchaseSpace(uint8 fromX, uint8 toX, uint8 fromY, uint8 toY) {
-		isValidMinSize(fromX, toX, fromY, toX);
-		isValidMaxSize(fromX, toX, fromY, toX);
-		isSpaceAlreadyTaken(fromX, toX, fromY, toX);
+	function isValidPurchaseSpace(uint8 fromX, uint8 toX, uint8 fromY, uint8 toY) 
+		isValidMinSize(fromX, toX, fromY, toX)
+		isValidMaxSize(fromX, toX, fromY, toX)
+		isSpaceAlreadyTaken(fromX, toX, fromY, toX)
+	{
+	
+	
 	}
 
 	// Validate min space is no smaller than 100 x 100 pixels long
@@ -182,7 +199,7 @@ contract AdvertBoard {
 		uint8 xAxis = fromX * toX;
 		uint8 yAxis = fromY * toY;
 
-		if ((xAxis > 100) || (yAxis > 100)) throw;
+		assert((xAxis > 100) && (yAxis > 100));
 		_;
 	}
 
@@ -191,15 +208,8 @@ contract AdvertBoard {
 		uint8 xAxis = fromX * toX;
 		uint8 yAxis = fromY * toY;
 
-		if ((xAxis < 1000) || (yAxis < 1000)) throw;
+		assert((xAxis < 1000) && (yAxis < 1000));
 		_;
 	}
 
-	// If something goes wrongs stop immediately!
-	modifier killSwitch {
-		if (msg.sender != admin) {
-			if (contractKilled) throw;
-		}
-		_;
-	}
 }
