@@ -1,5 +1,5 @@
-const HumanStandardToken = artifacts.require(`./BasicBoard.sol`);
+const BasicBoard = artifacts.require(`./BasicBoard.sol`);
 
 module.exports = (deployer) => {
-    deployer.deploy(HumanStandardToken)
+    deployer.deploy(BasicBoard)
 };
