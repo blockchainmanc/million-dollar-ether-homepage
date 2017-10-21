@@ -1,11 +1,46 @@
 {
-  "name": "million-dollar-homepage-ether",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "million-dollar-ether-homepage",
+  "version": "0.0.1",
+  "description": "Blockchain Manchester Million Dollor Home Page Example",
+  "main": "truffle.js",
+  "directories": {
+    "test": "test"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "standard && truffle test",
+    "lint": "standard --fix"
   },
   "author": "James Morgan <james.morgan.e@googlemail.com> (htp://github.com/jamesmorgan)",
-  "license": "ISC"
+  "license": "MIT",
+  "keywords": [
+    "ethereum",
+    "blockchain manchester",
+    "million dollar home page",
+    "truffle"
+  ],
+  "bugs": {
+    "url": "https://github.com/jamesmorgan/million-dollar-ether-homepage/issues"
+  },
+  "homepage": "https://github.com/jamesmorgan/million-dollar-ether-homepage#readme",
+  "dependencies": {
+    "truffle-hdwallet-provider": "0.0.3"
+  },
+  "devDependencies": {
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-node": "^5.1.0",
+    "eslint-plugin-react": "^7.1.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "standard": "^10.0.2"
+  },
+  "standard": {
+    "globals": [
+      "assert",
+      "it",
+      "before",
+      "beforeEach",
+      "artifacts",
+      "contract",
+      "web3"
+    ]
+  }
 }

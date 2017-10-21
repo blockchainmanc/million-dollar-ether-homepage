@@ -1,3 +1,10 @@
+.DS_Store
+/*.iml
+*.log
 
-/million-dollar-ether-homepage.iml
-/.idea/
+/samples/
+
+build
+node_modules
+.idea
+/mnemonic.js

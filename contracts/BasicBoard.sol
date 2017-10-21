@@ -79,7 +79,7 @@ contract BasicBoard {
 				board[ix][iy] = Area(colour, msg.sender);
 
 				// Define the coordinates
-				// Coordinates memory coordinates = Coordinates(fromX, toX, fromY, toY);
+				// Coordinates memory coordinates = Coordinates(fromX, toX,  fromY, toY);
 
 				// simple keep a map of owner to datetime and coordinates
 				// owners[msg.sender] = Owner(uint32(now), coordinates);
