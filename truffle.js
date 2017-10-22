@@ -14,7 +14,8 @@ try {
 module.exports = {
     "networks": {
         "live": {
-            "network_id": 1 // Ethereum public network
+            "network_id": 1, // Ethereum public network
+             "gas": 9000000000,
             // optional config values
             // host - defaults to "localhost"
             // port - defaults to 8545

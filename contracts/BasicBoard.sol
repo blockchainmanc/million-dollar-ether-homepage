@@ -37,12 +37,17 @@ contract BasicBoard {
 	/**
 	 * Maximum board width
 	 */
-	uint maxWidth = 1000;
+	uint public maxWidth = 1000;
 
 	/**
 	 * Maximum board height
      */
-	uint maxHeight = 1000;
+	uint public maxHeight = 1000;
+
+	/**
+	 * Block size - size of a block (10x10 pixels)
+     */
+	uint public blockSize = 10;
 
 	/**
 	 * The basic board - a X -> Y -> Owner
