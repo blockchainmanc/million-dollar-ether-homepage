@@ -19,8 +19,8 @@ pragma solidity ^0.4.13;
 contract BasicBoard {
 
 	struct Coordinate {
-		uint x;
-		uint y;
+		uint8 x;
+		uint8 y;
 	}
 
 	struct Owner {
@@ -54,75 +54,85 @@ contract BasicBoard {
 	 */
 	address private boardCreator;
 
-    /**
+	/**
      *  emergency kill switch, disables all future sales
      */
-    bool public stopped = false;
+	bool public stopped = false;
 
-    /**
+	/**
      *  Board constructor
      */
-    function BasicBoard() {
+	function BasicBoard() public {
 		boardCreator = msg.sender;
 	}
 
 	// Accessors
 
 	function purchaseSpace (uint8 fromX, uint8 toX, uint8 fromY, uint8 toY, string colour)
-    stopInEmergency
-    validateWithinBoardBoundary(fromX, toX, fromY, toY)
-	public
-    payable
-    returns(bool)
+	stopInEmergency
+	validateWithinBoardBoundary(fromX, toX, fromY, toY)
+	public payable returns(bool)
 	{
-        // TODO validate price?
-        // TODO how allow owner to sell block?
+		// TODO validate price?
+		// TODO how allow owner to sell block?
 
 		// iterate the pixel space
 		for (uint8 ix = fromX; ix <= toX; ix++) {
 			for (uint8 iy = fromY; iy <= toY; iy++) {
-
-				// Look up the existing area block
-                Owner storage existingOwner = board[ix][iy];
-
-				// validate area is available OR is owned by caller
-				require(existingOwner.owner == 0 || existingOwner.owner == msg.sender);
-
-				// Set block to colour at location
-                board[ix][iy] = Owner({
-                    owner: msg.sender,
-                    price: msg.value,
-                    colour: colour,
-                    purchasedDateTime: uint32(now),
-                    coordinate: Coordinate({x:ix, y:iy})
-                });
+				buyPixel(ix, iy, colour);
 			}
 		}
 
-        // fire purchased event
+		// fire purchased event
 		Purchased(fromX, toX, fromY, toY, colour, msg.sender);
 
 		return true;
 	}
 
+	function buyPixel (uint8 x, uint8 y, string colour)
+	private
+	isForSale(x, y)
+	returns (uint)
+	{
+		// Set block to colour at location
+		board[x][y] = Owner({
+			owner: msg.sender,
+			price: msg.value, // TODO is this price per pixel of total price?
+			colour: colour,
+			purchasedDateTime: uint32(block.timestamp),
+			coordinate: Coordinate({x:x, y:y})
+		});
+	}
+
 	/**
 	 * Return coordinate details
 	 */
-	function getCoordinateDetails(uint x, uint y) constant returns (address owner, uint price, string colour, uint32 purchasedDateTime) {
+	function getCoordinateDetails(uint8 x, uint8 y)
+    public constant
+    returns (address owner, uint price, string colour, uint32 purchasedDateTime) {
 		Owner storage o = board[x][y];
 		return (o.owner, o.price, o.colour, o.purchasedDateTime);
-    }
+	}
 
-    // TODO add function to get all pixels the caller owners
+	// TODO add function to get all pixels the caller owners
 
-    /**
+	modifier isForSale (uint8 x, uint8 y) {
+		// Look up the existing area block
+		Owner storage existingOwner = board[x][y];
+
+		// validate area is available OR is owned by caller
+		require(existingOwner.owner == 0 || existingOwner.owner == msg.sender);
+	    _;
+	}
+
+	/**
     * Validator - the kill switch
     */
 	function toggleContractActive() isBoardAdmin public {
 		stopped = !stopped;
 	}
 
-    /**
+	/**
      * Validator - fails when not the board admin i.e. the creator
      */
 	modifier isBoardAdmin {
@@ -130,7 +140,7 @@ contract BasicBoard {
 		_;
 	}
 
-    /**
+	/**
      * Validator - fails when area exceeds board boundary
      */
 	modifier validateWithinBoardBoundary(uint fromX, uint toX, uint fromY, uint toY) {
@@ -139,16 +149,16 @@ contract BasicBoard {
 		_;
 	}
 
-    // kill switch validators
+	// kill switch validators
 
 	modifier stopInEmergency {
 		require(!stopped);
-		 _;
+		_;
 	}
 
 	modifier onlyInEmergency {
-		 if (stopped)
-		 _;
+		if (stopped)
+		_;
 	}
 
 }
