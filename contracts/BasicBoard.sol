@@ -4,7 +4,7 @@ pragma solidity ^0.4.13;
 /**
  *
  * Concept:
- * 
+ *
  * Phase 1
  * =======
  *
@@ -19,20 +19,20 @@ pragma solidity ^0.4.13;
 contract BasicBoard {
 
 	struct Coordinate {
-		uint8 x;
-		uint8 y;
+		uint x;
+		uint y;
 	}
 
 	struct Owner {
-		address owner;  // owner of pixel
-		uint price;     // price payed for the pixel
-		string colour;   // colour in HEX or any string acceptable by CSS3 as a colour
-		uint32 purchasedDateTime;
-		Coordinate coordinate; // the purchased Coordinate
+		address owner;  			// owner of pixel
+		uint price;     			// price of pixel
+		string colour;   			// pixel colour
+		uint32 purchasedDateTime; 	// approx time it was purchased
+		Coordinate coordinate; 		// the purchased Coordinate
 	}
 
 	// Events
-	event Purchased(uint8 fromX, uint8 toX, uint8 fromY, uint8 toY, string colour, address owner);
+	event Purchased(uint fromX, uint toX, uint fromY, uint toY, string colour, address owner);
 
 	/**
 	 * Maximum board width
@@ -108,7 +108,7 @@ contract BasicBoard {
 	/**
 	 * Return coordinate details
 	 */
-	function getCoordinateDetails(uint x, uint8 y) constant returns (address owner, uint price, string colour, uint32 purchasedDateTime) {
+	function getCoordinateDetails(uint x, uint y) constant returns (address owner, uint price, string colour, uint32 purchasedDateTime) {
 		Owner storage o = board[x][y];
 		return (o.owner, o.price, o.colour, o.purchasedDateTime);
     }
@@ -133,7 +133,7 @@ contract BasicBoard {
     /**
      * Validator - fails when area exceeds board boundary
      */
-	modifier validateWithinBoardBoundary(uint8 fromX, uint8 toX, uint8 fromY, uint8 toY) {
+	modifier validateWithinBoardBoundary(uint fromX, uint toX, uint fromY, uint toY) {
 		assert(fromX >= 0 && toX <= maxWidth - 1);
 		assert(fromY >= 0 && toY <= maxHeight - 1);
 		_;

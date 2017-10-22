@@ -12,6 +12,7 @@ contract('BasicBoardContract spec', function (accounts) {
     });
 
     it('can purchase co-ordinate', async () => {
+        console.log(accounts);
 
         let details = await BasicBoard.getCoordinateDetails(0, 0);
         console.log("Before", details);
@@ -26,11 +27,11 @@ contract('BasicBoardContract spec', function (accounts) {
 
     });
 
-    it('can determine co-ordinates are already purchased', async () => {
+    it.skip('can determine co-ordinates are already purchased', async () => {
 
     });
 
-    it('can determine co-ordinates are out of range', async () => {
+    it.skip('can determine co-ordinates are out of range', async () => {
 
     });
 

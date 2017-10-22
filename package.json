@@ -8,7 +8,8 @@
   },
   "scripts": {
     "test": "standard && truffle test",
-    "lint": "standard --fix"
+    "lint": "standard --fix",
+    "deploy": "truffle migrate --reset"
   },
   "author": "James Morgan <james.morgan.e@googlemail.com> (htp://github.com/jamesmorgan)",
   "license": "MIT",
@@ -26,12 +27,12 @@
     "truffle-hdwallet-provider": "0.0.3"
   },
   "devDependencies": {
-    "eslint-plugin-import": "^2.7.0",
-    "eslint-plugin-node": "^5.1.0",
-    "eslint-plugin-react": "^7.1.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-node": "^5.2.0",
+    "eslint-plugin-react": "^7.4.0",
     "eslint-plugin-standard": "^3.0.1",
     "lodash": "^4.17.4",
-    "standard": "^10.0.2"
+    "standard": "^10.0.3"
   },
   "standard": {
     "globals": [
