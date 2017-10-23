@@ -1,4 +1,4 @@
-# Blockchain Manchester Token
+# Million dollar ether homepage
 
 TODO
 
